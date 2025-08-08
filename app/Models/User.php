@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -22,6 +23,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'nis',
+        'nip',
     ];
 
     /**
@@ -50,12 +54,24 @@ class User extends Authenticatable
     /**
      * Get the user's initials
      */
-    public function initials(): string
+    public function pendaftarans(): HasMany
     {
-        return Str::of($this->name)
-            ->explode(' ')
-            ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
-            ->implode('');
+        return $this->hasMany(PendaftaranEkskul::class);
+    }
+    public function ekskulsDibimbing(): HasMany
+    {
+        return $this->hasMany(Ekskul::class, 'guru_pembimbing_id');
+    }
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+    public function isGuru(): bool
+    {
+        return $this->role === 'guru';
+    }
+    public function isSiswa(): bool
+    {
+        return $this->role === 'siswa';
     }
 }
